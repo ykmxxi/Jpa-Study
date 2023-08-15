@@ -1,0 +1,20 @@
+spring:
+  datasource: # 띄어쓰기 2칸
+    url: jdbc:h2:tcp://localhost/~/jpashop; # 4칸
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  jpa: # 2칸
+    hibernate: # 4칸
+      ddl-auto: create # 6칸
+    properties:
+      hibernate:
+#        show_sql: true # 운영 환경에서는 System.out 대신 로그로 남기는 것이 좋다
+        format_sql: true # 8칸
+
+logging:
+  level:
+    org.hibernate.sql: debug # logger를 통해 실행 SQL을 남긴다
+#     org.hibernate.type: trace #스프링 부트 2.x, hibernate5
+#     org.hibernate.orm.jdbc.bind: trace #스프링 부트 3.x, hibernate6
