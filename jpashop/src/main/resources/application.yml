@@ -12,6 +12,9 @@ spring:
       hibernate:
 #        show_sql: true # 운영 환경에서는 System.out 대신 로그로 남기는 것이 좋다
         format_sql: true # 8칸
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
 
 logging:
   level:
