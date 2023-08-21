@@ -21,6 +21,17 @@ public class ItemService {
 		itemRepository.save(item);
 	}
 
+	/**
+	 * 영속성 컨텍스트가 자동 변경: 변경 감지(dirty checking) 기능 사용
+	 */
+	@Transactional
+	public void updateItem(Long itemId, String name, int price, int stockQuantity) {
+		Item findItem = itemRepository.findOne(itemId);
+		findItem.setName(name);
+		findItem.setPrice(price);
+		findItem.setStockQuantity(stockQuantity);
+	}
+
 	public List<Item> findItems() {
 		return itemRepository.findAll();
 	}
