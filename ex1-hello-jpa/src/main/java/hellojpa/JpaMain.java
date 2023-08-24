@@ -35,6 +35,12 @@ public class JpaMain {
 			Member findMember = em.find(Member.class, 2L);
 			findMember.setName("이름 수정");
 
+			// 준영속(detached) 상태
+			Member findMember1 = em.find(Member.class, 1L);
+			findMember1.setName("준영속");
+
+			em.detach(findMember1);
+
 			List<Member> members = em.createQuery("select m from Member m", Member.class)
 				.getResultList();
 
