@@ -22,6 +22,15 @@ public class JpaMain {
 			// member.setName("HelloJPA");
 			// em.persist(member); // 저장
 
+			// 생성만 하면 member는 비영속 상태
+			Member member = new Member();
+			member.setId(3L);
+			member.setName("UserA");
+
+			// member가 영속 상태가 됨
+			// 이때 DB에 저장되는 것이 아님
+			em.persist(member);
+
 			List<Member> members = em.createQuery("select m from Member m", Member.class)
 				.getResultList();
 
