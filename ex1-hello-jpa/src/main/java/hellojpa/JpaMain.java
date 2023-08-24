@@ -31,6 +31,10 @@ public class JpaMain {
 			// 이때 DB에 저장되는 것이 아님
 			em.persist(member);
 
+			// 변경 감지(Dirty Checking)
+			Member findMember = em.find(Member.class, 2L);
+			findMember.setName("이름 수정");
+
 			List<Member> members = em.createQuery("select m from Member m", Member.class)
 				.getResultList();
 
