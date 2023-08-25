@@ -23,13 +23,23 @@ public class JpaMain {
 			// em.persist(member); // 저장
 
 			// 생성만 하면 member는 비영속 상태
-			Member member = new Member();
-			member.setId(3L);
-			member.setName("UserA");
+			Member member1 = new Member();
+			member1.setName("UserA");
+			Member member2 = new Member();
+			member2.setName("UserB");
+			Member member3 = new Member();
+			member3.setName("UserC");
 
 			// member가 영속 상태가 됨
 			// 이때 DB에 저장되는 것이 아님
-			em.persist(member);
+			em.persist(member1);
+			em.persist(member2);
+			em.persist(member3);
+
+			// IDENTITY 전략은 persist() 시점에 INSERT 쿼리를 날림
+			System.out.println("member1.id = " + member1.getId());
+			System.out.println("member2.id = " + member2.getId());
+			System.out.println("member3.id = " + member3.getId());
 
 			// 변경 감지(Dirty Checking)
 			Member findMember = em.find(Member.class, 2L);
