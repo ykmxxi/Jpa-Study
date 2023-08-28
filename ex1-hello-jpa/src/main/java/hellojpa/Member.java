@@ -1,55 +1,28 @@
 package hellojpa;
 
-import java.util.Date;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.Transient;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 @Entity
 public class Member {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Id @GeneratedValue
+	@Column(name = "MEMBER_ID")
 	private Long id;
 
-	// 제약조건 추가: 회원 이름은 필수이고 10자를 초과하면 안됨
-	@Column(nullable = false, length = 10)
+	@Column(name = "USERNAME")
 	private String name;
 
-	private Integer age;
+	// @Column(name = "TEAM_ID")
+	// private Long teamId;
 
-	@Enumerated(EnumType.STRING)
-	private RoleType rolType;
-
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date createdDate;
-
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date lastModifiedDate;
-
-	@Lob
-	private String description;
-
-	@Transient
-	private int temp;
-
-	// JPA 스펙 상 기본 생성자가 필요
-	public Member() {
-	}
-
-	public Member(Long id, String name) {
-		this.id = id;
-		this.name = name;
-	}
+	@ManyToOne
+	@JoinColumn(name = "TEAM_ID")
+	private Team team;
 
 	public Long getId() {
 		return id;
@@ -61,6 +34,21 @@ public class Member {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public Team getTeam() {
+		return team;
+	}
+
+	/**
+	 * 연관관계 편의 메서드
+	 */
+	public void changeTeam(Team team) {
+		this.team = team;
+
+		// 역방향(주인이 아닌 방향) 연관관계 설정
+		// 객체지향 관점에서도 양쪽 다 값을 넣어줘야 좋음
+		team.getMembers().add(this);
 	}
 
 }
