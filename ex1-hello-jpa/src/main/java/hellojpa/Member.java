@@ -40,8 +40,15 @@ public class Member {
 		return team;
 	}
 
-	public void setTeam(Team team) {
+	/**
+	 * 연관관계 편의 메서드
+	 */
+	public void changeTeam(Team team) {
 		this.team = team;
+
+		// 역방향(주인이 아닌 방향) 연관관계 설정
+		// 객체지향 관점에서도 양쪽 다 값을 넣어줘야 좋음
+		team.getMembers().add(this);
 	}
 
 }
