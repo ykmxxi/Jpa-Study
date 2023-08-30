@@ -5,6 +5,8 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 
+import jpabook.jpashop.domain.Movie;
+
 public class JpaMain {
 
 	public static void main(String[] args) {
@@ -15,6 +17,14 @@ public class JpaMain {
 		tx.begin();
 
 		try {
+
+			Movie movie = new Movie();
+			movie.setActor("로다주");
+			movie.setDirector("마블");
+			movie.setName("아이언 맨");
+			movie.setPrice(10000);
+
+			em.persist(movie);
 
 			tx.commit();
 		} catch (Exception e) {
