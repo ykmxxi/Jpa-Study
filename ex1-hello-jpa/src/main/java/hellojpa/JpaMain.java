@@ -28,6 +28,13 @@ public class JpaMain {
 //			em.persist(child1);
 //			em.persist(child2);
 
+			em.flush();
+			em.clear();
+
+			// 고아 객체 제거
+			Parent findParent = em.find(Parent.class, parent.getId());
+			findParent.getChildList().remove(0); // child1 삭제
+
 			tx.commit(); // 트랜잭션 커밋
 		} catch (Exception e) {
 			tx.rollback(); // 트랜잭션 롤백
