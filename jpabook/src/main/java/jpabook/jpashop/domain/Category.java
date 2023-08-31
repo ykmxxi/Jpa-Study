@@ -1,5 +1,7 @@
 package jpabook.jpashop.domain;
 
+import static javax.persistence.FetchType.LAZY;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +22,7 @@ public class Category extends BaseEntity {
 
 	private String name;
 
-	@ManyToOne
+	@ManyToOne(fetch = LAZY)
 	@JoinColumn(name = "PARENT_ID")
 	private Category parent;
 

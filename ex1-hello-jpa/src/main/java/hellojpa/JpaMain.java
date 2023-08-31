@@ -15,13 +15,25 @@ public class JpaMain {
 		tx.begin();
 		try {
 
-			Movie movie = new Movie();
-			movie.setName("아이언맨");
-			movie.setActor("로다주");
-			movie.setDirector("Marvel");
-			movie.setPrice(10000);
+			Child child1 = new Child();
+			Child child2 = new Child();
 
-			em.persist(movie);
+			Parent parent = new Parent();
+			parent.addChild(child1);
+			parent.addChild(child2);
+
+			// persist()를 3번 호출
+			// cascade = CascadeType.ALL 영속성 전이 설정 시 1번만 호출해도 모두 저장
+			em.persist(parent);
+//			em.persist(child1);
+//			em.persist(child2);
+
+			em.flush();
+			em.clear();
+
+			// 고아 객체 제거
+			Parent findParent = em.find(Parent.class, parent.getId());
+			findParent.getChildList().remove(0); // child1 삭제
 
 			tx.commit(); // 트랜잭션 커밋
 		} catch (Exception e) {
