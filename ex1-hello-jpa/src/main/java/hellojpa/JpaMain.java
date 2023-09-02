@@ -1,5 +1,8 @@
 package hellojpa;
 
+import java.util.List;
+import java.util.Set;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
@@ -15,25 +18,47 @@ public class JpaMain {
 		tx.begin();
 		try {
 
-			Child child1 = new Child();
-			Child child2 = new Child();
+			Member member = new Member();
+			member.setUsername("member1");
+			member.setHomeAddress(new Address("homeCity", "street1", "10000"));
 
-			Parent parent = new Parent();
-			parent.addChild(child1);
-			parent.addChild(child2);
+			member.getFavoriteFoods().add("치킨");
+			member.getFavoriteFoods().add("족발");
+			member.getFavoriteFoods().add("피자");
 
-			// persist()를 3번 호출
-			// cascade = CascadeType.ALL 영속성 전이 설정 시 1번만 호출해도 모두 저장
-			em.persist(parent);
-//			em.persist(child1);
-//			em.persist(child2);
+			member.getAddressHistory().add(new Address("old1", "street1", "10000"));
+			member.getAddressHistory().add(new Address("old2", "street1", "10000"));
+
+			em.persist(member);
 
 			em.flush();
 			em.clear();
 
-			// 고아 객체 제거
-			Parent findParent = em.find(Parent.class, parent.getId());
-			findParent.getChildList().remove(0); // child1 삭제
+			System.out.println("================= START =================");
+			Member findMember = em.find(Member.class, member.getId());
+			System.out.println("================= END =================");
+
+			// 컬렉션들을 지연 로딩
+			List<Address> addressHistory = findMember.getAddressHistory();
+			for (Address address : addressHistory) {
+				System.out.println("address = " + address.getCity());
+			}
+
+			Set<String> favoriteFoods = findMember.getFavoriteFoods();
+			for (String favoriteFood : favoriteFoods) {
+				System.out.println("favoriteFood = " + favoriteFood);
+			}
+
+			// 값 타입 수정: homeCity -> newCity, 객체를 새로운 객체로 교체해야 함
+			Address oldAddr = findMember.getHomeAddress();
+			findMember.setHomeAddress(new Address("newCity", oldAddr.getStreet(), oldAddr.getZipcode()));
+
+			// 값 타입 컬렉션 수정: 치킨 -> 한식, old1 -> newCity1
+			findMember.getFavoriteFoods().remove("치킨");
+			findMember.getFavoriteFoods().add("한식");
+
+			findMember.getAddressHistory().remove(new Address("old1", "street1", "10000"));
+			findMember.getAddressHistory().add(new Address("newCity1", "street", "10000"));
 
 			tx.commit(); // 트랜잭션 커밋
 		} catch (Exception e) {

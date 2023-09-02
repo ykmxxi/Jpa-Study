@@ -1,12 +1,18 @@
 package hellojpa;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 
 @Entity
 public class Member extends BaseEntity {
@@ -16,37 +22,58 @@ public class Member extends BaseEntity {
 	private Long id;
 
 	@Column(name = "USERNAME")
-	private String name;
+	private String username;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "TEAM_ID")
-	private Team team;
+	@Embedded
+	private Address homeAddress;
+
+	@ElementCollection
+	@CollectionTable(name = "FAVORITE_FOOD", joinColumns = @JoinColumn(name = "MEMBER_ID"))
+	@Column(name = "FOOD_NAME")
+	private Set<String> favoriteFoods = new HashSet<>();
+
+	@ElementCollection
+	@CollectionTable(name = "ADDRESS", joinColumns = @JoinColumn(name = "MEMBER_ID"))
+	private List<Address> addressHistory = new ArrayList<>();
 
 	public Long getId() {
 		return id;
 	}
 
-	public String getName() {
-		return name;
+	public void setId(Long id) {
+		this.id = id;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public String getUsername() {
+		return username;
 	}
 
-	public Team getTeam() {
-		return team;
+	public void setUsername(String username) {
+		this.username = username;
 	}
 
-	/**
-	 * 연관관계 편의 메서드
-	 */
-	public void changeTeam(Team team) {
-		this.team = team;
+	public Address getHomeAddress() {
+		return homeAddress;
+	}
 
-		// 역방향(주인이 아닌 방향) 연관관계 설정
-		// 객체지향 관점에서도 양쪽 다 값을 넣어줘야 좋음
-		team.getMembers().add(this);
+	public void setHomeAddress(Address homeAddress) {
+		this.homeAddress = homeAddress;
+	}
+
+	public Set<String> getFavoriteFoods() {
+		return favoriteFoods;
+	}
+
+	public void setFavoriteFoods(Set<String> favoriteFoods) {
+		this.favoriteFoods = favoriteFoods;
+	}
+
+	public List<Address> getAddressHistory() {
+		return addressHistory;
+	}
+
+	public void setAddressHistory(List<Address> addressHistory) {
+		this.addressHistory = addressHistory;
 	}
 
 }
