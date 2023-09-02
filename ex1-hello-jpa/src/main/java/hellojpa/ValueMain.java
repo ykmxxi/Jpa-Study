@@ -5,12 +5,15 @@ public class ValueMain {
 	public static void main(String[] args) {
 
 		int a = 10;
-		int b = a; // a의 값이 복사가 되어서 b에 들어가는 것, 공유가 안되고 있음
+		int b = 10;
 
-		a = 20;
+		System.out.println("a == b: " + (a == b));
 
-		System.out.println("a = " + a); // 20
-		System.out.println("b = " + b); // 10
+		Address address1 = new Address("city", "street", "10000");
+		Address address2 = new Address("city", "street", "10000");
+
+		System.out.println("address1 == address2: " + (address1 == address2)); // false
+		System.out.println("address1 equals address2: " + address1.equals(address2)); // true
 	}
 
 }
