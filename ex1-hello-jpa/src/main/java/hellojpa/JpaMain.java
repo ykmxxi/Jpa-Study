@@ -1,6 +1,7 @@
 package hellojpa;
 
-import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -17,24 +18,47 @@ public class JpaMain {
 		tx.begin();
 		try {
 
-			Address address = new Address("city", "street", "10000");
+			Member member = new Member();
+			member.setUsername("member1");
+			member.setHomeAddress(new Address("homeCity", "street1", "10000"));
 
-			Member member1 = new Member();
-			member1.setUsername("member1");
-			member1.setHomeAddress(address);
-			em.persist(member1);
+			member.getFavoriteFoods().add("치킨");
+			member.getFavoriteFoods().add("족발");
+			member.getFavoriteFoods().add("피자");
 
-			// 객체를 공유하지 않고 복사해서 사용해야 한다
-			Address copyAddress = new Address(address.getCity(), address.getStreet(), address.getZipcode());
-			Member member2 = new Member();
-			member2.setUsername("member2");
-			member2.setHomeAddress(copyAddress);
-			em.persist(member2);
+			member.getAddressHistory().add(new Address("old1", "street1", "10000"));
+			member.getAddressHistory().add(new Address("old2", "street1", "10000"));
 
-			member1.getHomeAddress().setCity("newCity"); // member1의 city만 변경하고 싶음
+			em.persist(member);
 
-			// 복사해서 사용했기 때문에 member2는 변경되지 않음
-			System.out.println("member2.City() = " + member2.getHomeAddress().getCity());
+			em.flush();
+			em.clear();
+
+			System.out.println("================= START =================");
+			Member findMember = em.find(Member.class, member.getId());
+			System.out.println("================= END =================");
+
+			// 컬렉션들을 지연 로딩
+			List<Address> addressHistory = findMember.getAddressHistory();
+			for (Address address : addressHistory) {
+				System.out.println("address = " + address.getCity());
+			}
+
+			Set<String> favoriteFoods = findMember.getFavoriteFoods();
+			for (String favoriteFood : favoriteFoods) {
+				System.out.println("favoriteFood = " + favoriteFood);
+			}
+
+			// 값 타입 수정: homeCity -> newCity, 객체를 새로운 객체로 교체해야 함
+			Address oldAddr = findMember.getHomeAddress();
+			findMember.setHomeAddress(new Address("newCity", oldAddr.getStreet(), oldAddr.getZipcode()));
+
+			// 값 타입 컬렉션 수정: 치킨 -> 한식, old1 -> newCity1
+			findMember.getFavoriteFoods().remove("치킨");
+			findMember.getFavoriteFoods().add("한식");
+
+			findMember.getAddressHistory().remove(new Address("old1", "street1", "10000"));
+			findMember.getAddressHistory().add(new Address("newCity1", "street", "10000"));
 
 			tx.commit(); // 트랜잭션 커밋
 		} catch (Exception e) {
