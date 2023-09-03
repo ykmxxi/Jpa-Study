@@ -34,6 +34,12 @@ public class JpaMain {
 				System.out.println("member.name = " + m.getUsername());
 			}
 
+			// 파라미터 바인딩: 이름 기준을 사용하자
+			Member resultMember = em.createQuery("select m from Member m where m.username = :username", Member.class)
+									.setParameter("username", "member1")
+									.getSingleResult();
+			System.out.println("resultMember = " + resultMember.getUsername());
+
 			tx.commit();
 		} catch (Exception e) {
 			tx.rollback();
