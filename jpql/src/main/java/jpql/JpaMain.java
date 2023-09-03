@@ -4,6 +4,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
 public class JpaMain {
 
@@ -14,6 +16,16 @@ public class JpaMain {
 
 		tx.begin();
 		try {
+
+			Member member = new Member();
+			member.setUsername("member1");
+			member.setAge(10);
+			em.persist(member);
+
+			// 반환 타입이 명확
+			TypedQuery<Member> typedQuery = em.createQuery("select m from Member m", Member.class);
+			// 반환 타입이 명확하지 않음
+			Query query = em.createQuery("select m.username, m.age from Member m");
 
 			tx.commit();
 		} catch (Exception e) {
