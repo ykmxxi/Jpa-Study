@@ -37,6 +37,12 @@ public class JpaMain {
 			member2.changeTeam(team);
 			em.persist(member2);
 
+			Member member3 = new Member();
+			member3.setUsername("관리자");
+			member2.setType(MemberType.ADMIN);
+
+			em.persist(member3);
+
 			em.flush();
 			em.clear();
 
@@ -80,7 +86,15 @@ public class JpaMain {
 			for (String fee : resultList) {
 				System.out.println("fee = " + fee);
 			}
-			
+
+			// 사용자 이름이 '관리자'면 null을 반환하고 나머지는 본인의 이름을 반환
+			String query4 = "select nullif(m.username, '관리자') from Member m";
+			List<String> resultList1 = em.createQuery(query4, String.class)
+										 .getResultList();
+			for (String username : resultList1) {
+				System.out.println("username = " + username);
+			}
+
 			tx.commit();
 		} catch (Exception e) {
 			tx.rollback();
