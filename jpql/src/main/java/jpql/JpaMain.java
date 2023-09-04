@@ -49,26 +49,32 @@ public class JpaMain {
 			System.out.println("member.name = " + memberDTO.getUsername());
 			System.out.println("memberDTO.age = " + memberDTO.getAge());
 
-			for (int i = 2; i < 100; i++) {
-				Member m = new Member();
-				m.setUsername("member" + i);
-				m.setAge(i);
-				em.persist(m);
-			}
+			Team t = new Team();
+			t.setName("teamA");
+			em.persist(t);
+
+			Member m = new Member();
+			m.setUsername("member2");
+			m.setAge(20);
+			m.changeTeam(t);
+			em.persist(m);
+
 			em.flush();
 			em.clear();
 
-			// 페이징
-			List<Member> pagingResult = em.createQuery("select m from Member m order by m.age desc", Member.class)
-										  .setFirstResult(88)
-										  .setMaxResults(20)
-										  .getResultList();
+			// 조인: 내부 조인, 외부 조인, 세타 조인
+			String inner = "select m from Member m join m.team t";
+			String outer = "select m from Member m left join m.team t";
+			String theta = "select m from Member m, Team t where m.username = t.name";
+			List<Member> innerResult = em.createQuery(inner, Member.class)
+										 .getResultList();
 
-			System.out.println("pagingResult.size() = " + pagingResult.size());
-			for (Member m : pagingResult) {
-				System.out.println("member.name = " + m.getUsername());
-				System.out.println("member.age = " + m.getAge());
-			}
+			List<Member> outerResult = em.createQuery(outer, Member.class)
+										 .getResultList();
+
+			List<Member> thetaResult = em.createQuery(theta, Member.class)
+										 .getResultList();
+			System.out.println("thetaResult.size() = " + thetaResult.size());
 
 			tx.commit();
 		} catch (Exception e) {
