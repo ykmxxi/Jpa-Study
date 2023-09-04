@@ -49,6 +49,27 @@ public class JpaMain {
 			System.out.println("member.name = " + memberDTO.getUsername());
 			System.out.println("memberDTO.age = " + memberDTO.getAge());
 
+			for (int i = 2; i < 100; i++) {
+				Member m = new Member();
+				m.setUsername("member" + i);
+				m.setAge(i);
+				em.persist(m);
+			}
+			em.flush();
+			em.clear();
+
+			// 페이징
+			List<Member> pagingResult = em.createQuery("select m from Member m order by m.age desc", Member.class)
+										  .setFirstResult(88)
+										  .setMaxResults(20)
+										  .getResultList();
+
+			System.out.println("pagingResult.size() = " + pagingResult.size());
+			for (Member m : pagingResult) {
+				System.out.println("member.name = " + m.getUsername());
+				System.out.println("member.age = " + m.getAge());
+			}
+
 			tx.commit();
 		} catch (Exception e) {
 			tx.rollback();
