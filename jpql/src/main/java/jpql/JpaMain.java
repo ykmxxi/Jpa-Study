@@ -66,6 +66,21 @@ public class JpaMain {
 				System.out.println("name = " + name);
 			}
 
+			// 기본 CASE 식
+			String query3 =
+				"select " +
+					"case when m.age <= 19 then '학생요금' " +
+					"when m.age >= 60 then '경로요금' " +
+					"else '일반요금' " +
+					"end " +
+					"from Member m";
+
+			List<String> resultList = em.createQuery(query3, String.class)
+										.getResultList();
+			for (String fee : resultList) {
+				System.out.println("fee = " + fee);
+			}
+			
 			tx.commit();
 		} catch (Exception e) {
 			tx.rollback();
