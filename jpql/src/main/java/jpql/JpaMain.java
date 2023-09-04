@@ -40,6 +40,15 @@ public class JpaMain {
 									.getSingleResult();
 			System.out.println("resultMember = " + resultMember.getUsername());
 
+			// 단순 값을 DTO로 조회
+			List<MemberDTO> resultList =
+				em.createQuery("select new jpql.MemberDTO(m.username, m.age) from Member m", MemberDTO.class)
+				  .getResultList();
+
+			MemberDTO memberDTO = resultList.get(0);
+			System.out.println("member.name = " + memberDTO.getUsername());
+			System.out.println("memberDTO.age = " + memberDTO.getAge());
+
 			tx.commit();
 		} catch (Exception e) {
 			tx.rollback();
