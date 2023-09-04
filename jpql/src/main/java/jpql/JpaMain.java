@@ -6,8 +6,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
-import javax.persistence.Query;
-import javax.persistence.TypedQuery;
 
 public class JpaMain {
 
@@ -19,62 +17,43 @@ public class JpaMain {
 		tx.begin();
 		try {
 
-			Member member = new Member();
-			member.setUsername("member1");
-			member.setAge(10);
-			em.persist(member);
+			Team team = new Team();
+			team.setName("teamA");
+			em.persist(team);
 
-			// 반환 타입이 명확
-			TypedQuery<Member> typedQuery = em.createQuery("select m from Member m", Member.class);
-			// 반환 타입이 명확하지 않음
-			Query query = em.createQuery("select m.username, m.age from Member m");
+			Member member1 = new Member();
+			member1.setUsername("member1");
+			member1.setAge(10);
 
-			List<Member> result = typedQuery.getResultList();
-			for (Member m : result) {
-				System.out.println("member.name = " + m.getUsername());
-			}
+			member1.changeTeam(team);
+			em.persist(member1);
 
-			// 파라미터 바인딩: 이름 기준을 사용하자
-			Member resultMember = em.createQuery("select m from Member m where m.username = :username", Member.class)
-									.setParameter("username", "member1")
-									.getSingleResult();
-			System.out.println("resultMember = " + resultMember.getUsername());
+			Member member2 = new Member();
+			member2.setUsername("member2");
+			member2.setAge(20);
 
-			// 단순 값을 DTO로 조회
-			List<MemberDTO> resultList =
-				em.createQuery("select new jpql.MemberDTO(m.username, m.age) from Member m", MemberDTO.class)
-				  .getResultList();
-
-			MemberDTO memberDTO = resultList.get(0);
-			System.out.println("member.name = " + memberDTO.getUsername());
-			System.out.println("memberDTO.age = " + memberDTO.getAge());
-
-			Team t = new Team();
-			t.setName("teamA");
-			em.persist(t);
-
-			Member m = new Member();
-			m.setUsername("member2");
-			m.setAge(20);
-			m.changeTeam(t);
-			em.persist(m);
+			member2.changeTeam(team);
+			em.persist(member2);
 
 			em.flush();
 			em.clear();
 
-			// 조인: 내부 조인, 외부 조인, 세타 조인
-			String inner = "select m from Member m join m.team t";
-			String outer = "select m from Member m left join m.team t";
-			String theta = "select m from Member m, Team t where m.username = t.name";
-			List<Member> innerResult = em.createQuery(inner, Member.class)
-										 .getResultList();
+			// 나이가 평균보다 많은 회원
+			String query = "select m from Member m where m.age > (select avg(m2.age) from Member m2)";
+			List<Member> result = em.createQuery(query, Member.class)
+									.getResultList();
 
-			List<Member> outerResult = em.createQuery(outer, Member.class)
-										 .getResultList();
+			for (Member m : result) {
+				System.out.println("member.name = " + m.getUsername() + ", member.age = " + m.getAge());
+			}
 
-			List<Member> thetaResult = em.createQuery(theta, Member.class)
-										 .getResultList();
-			System.out.println("thetaResult.size() = " + thetaResult.size());
+			// 어떤 팀이든 팀에 소속된 회원
+			String query1 = "select m from Member m where m.team = ANY (select t from Team t)";
+			List<Member> result1 = em.createQuery(query1, Member.class)
+									 .getResultList();
+			for (Member m : result1) {
+				System.out.println("member.name = " + m.getUsername() + ", member.team = " + m.getTeam().getName());
+			}
 
 			tx.commit();
 		} catch (Exception e) {
