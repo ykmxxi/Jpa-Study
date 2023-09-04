@@ -24,6 +24,7 @@ public class JpaMain {
 			Member member1 = new Member();
 			member1.setUsername("member1");
 			member1.setAge(10);
+			member1.setType(MemberType.USER);
 
 			member1.changeTeam(team);
 			em.persist(member1);
@@ -31,6 +32,7 @@ public class JpaMain {
 			Member member2 = new Member();
 			member2.setUsername("member2");
 			member2.setAge(20);
+			member2.setType(MemberType.ADMIN);
 
 			member2.changeTeam(team);
 			em.persist(member2);
@@ -53,6 +55,15 @@ public class JpaMain {
 									 .getResultList();
 			for (Member m : result1) {
 				System.out.println("member.name = " + m.getUsername() + ", member.team = " + m.getTeam().getName());
+			}
+
+			// ADMIN인 유저 조회
+			String query2 = "select m.username from Member m " +
+				"where m.type = jpql.MemberType.ADMIN";
+			List<String> result2 = em.createQuery(query2, String.class)
+									 .getResultList();
+			for (String name : result2) {
+				System.out.println("name = " + name);
 			}
 
 			tx.commit();
