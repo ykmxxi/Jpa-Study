@@ -54,6 +54,19 @@ public class JpaMain {
 				System.out.println("member = " + member.getUsername() + ", team = " + member.getTeam().getName());
 			}
 
+			// 컬렉션일 때. 즉, 일대다 관계에서 DB 입장에서 데이터가 중복 됨 -> DISTINCT 로 해결
+//			String query2 = "select t from Team t join fetch t.members";
+			String query2 = "select distinct t from Team t join fetch t.members";
+			List<Team> result2 = em.createQuery(query2, Team.class)
+								   .getResultList();
+			for (Team team : result2) {
+				System.out.println("team = " + team.getName() + ", 팀원 수 = " + team.getMembers().size());
+
+				for (Member member : team.getMembers()) {
+					System.out.println(team.getName() + "'s member = " + member.getUsername());
+				}
+			}
+
 			tx.commit();
 		} catch (Exception e) {
 			tx.rollback();
