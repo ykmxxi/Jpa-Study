@@ -95,6 +95,15 @@ public class JpaMain {
 				System.out.println("username = " + username);
 			}
 
+			// 성공: FROM 절에서 명시적 조인을 통해 별칭을 얻음
+			// 항상 명시적 조인을 사용하자
+			String query5 = "select m.username from Team t join t.members m";
+			List<String> resultList2 = em.createQuery(query5, String.class)
+										 .getResultList();
+			for (String name : resultList2) {
+				System.out.println("name = " + name);
+			}
+
 			tx.commit();
 		} catch (Exception e) {
 			tx.rollback();
