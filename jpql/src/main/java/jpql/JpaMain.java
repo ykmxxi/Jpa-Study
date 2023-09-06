@@ -40,6 +40,24 @@ public class JpaMain {
 			member3.changeTeam(team2);
 			em.persist(member3);
 
+			Product product1 = new Product();
+			product1.setName("A");
+			product1.setPrice(10000);
+			product1.setStockAmount(5);
+			em.persist(product1);
+
+			Product product2 = new Product();
+			product2.setName("B");
+			product2.setPrice(20000);
+			product2.setStockAmount(9);
+			em.persist(product2);
+
+			Product product3 = new Product();
+			product3.setName("C");
+			product3.setPrice(30000);
+			product3.setStockAmount(10);
+			em.persist(product3);
+
 			em.flush();
 			em.clear();
 
@@ -89,6 +107,15 @@ public class JpaMain {
 							   .setParameter("username", "member3")
 							   .getSingleResult();
 			System.out.println("result4 = " + result4.getUsername());
+
+			// 벌크 연산
+			String query4 = "update Product p "
+				+ "set p.price = p.price * 1.1 "
+				+ "where p.stockAmount < :stockAmount";
+			int cnt = em.createQuery(query4)
+						.setParameter("stockAmount", 10)
+						.executeUpdate();
+			System.out.println("cnt = " + cnt);
 
 			tx.commit();
 		} catch (Exception e) {
