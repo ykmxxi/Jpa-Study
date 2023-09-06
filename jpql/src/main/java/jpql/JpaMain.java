@@ -117,6 +117,14 @@ public class JpaMain {
 						.executeUpdate();
 			System.out.println("cnt = " + cnt);
 
+			// 벌크 연산 주의점: 데이터 정합성 문제가 발생할 수 있다
+			System.out.println("product1.price = " + product1.getPrice()); // 10,000 그대로
+
+			// 영속성 컨텍스트를 초기화하고 DB에서 다시 조회해야 함
+			em.clear();
+			Product findProduct = em.find(Product.class, product1.getId());
+			System.out.println("find product1.price = " + findProduct.getPrice()); // 11,000
+
 			tx.commit();
 		} catch (Exception e) {
 			tx.rollback();
