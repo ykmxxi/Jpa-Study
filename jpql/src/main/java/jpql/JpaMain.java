@@ -67,6 +67,23 @@ public class JpaMain {
 				}
 			}
 
+			// 엔티티 직접 사용: 기본 키(PK) 값 사용
+			String query3 = "select m from Member m where m = :member";
+			Member findMember = em.createQuery(query3, Member.class)
+								  .setParameter("member", member1)
+								  .getSingleResult();
+			System.out.println("findMember = " + findMember);
+
+			// 엔티티 직접 사용: 외래 키(FK) 값 사용
+			Team findTeam = em.find(Team.class, 1L);
+			String query1 = "select m from Member m where m.team = :team";
+			List<Member> result3 = em.createQuery(query1, Member.class)
+									 .setParameter("team", findTeam)
+									 .getResultList();
+			for (Member member : result3) {
+				System.out.println("member.Username = " + member.getUsername());
+			}
+
 			tx.commit();
 		} catch (Exception e) {
 			tx.rollback();
