@@ -84,6 +84,12 @@ public class JpaMain {
 				System.out.println("member.Username = " + member.getUsername());
 			}
 
+			// Named 쿼리: 어노테이션 사용
+			Member result4 = em.createNamedQuery("Member.findByUsername", Member.class)
+							   .setParameter("username", "member3")
+							   .getSingleResult();
+			System.out.println("result4 = " + result4.getUsername());
+
 			tx.commit();
 		} catch (Exception e) {
 			tx.rollback();
