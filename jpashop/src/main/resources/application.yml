@@ -7,7 +7,7 @@ spring:
 
   jpa: # 2칸
     hibernate: # 4칸
-      ddl-auto: create # 6칸
+      ddl-auto: none # 6칸
     properties:
       hibernate:
 #        show_sql: true # 운영 환경에서는 System.out 대신 로그로 남기는 것이 좋다

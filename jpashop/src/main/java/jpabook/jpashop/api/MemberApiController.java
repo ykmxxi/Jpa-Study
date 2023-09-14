@@ -1,7 +1,10 @@
 package jpabook.jpashop.api;
 
+import java.util.List;
+
 import javax.validation.Valid;
 
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,6 +30,14 @@ public class MemberApiController {
 		Long id = memberService.join(member);
 
 		return new CreateMemberResponse(id);
+	}
+
+	/**
+	 * 회원 조회 V1: 응답 값으로 엔티티를 직접 외부에 노출
+	 */
+	@GetMapping("/api/v1/members")
+	public List<Member> membersV1() {
+		return memberService.findMembers();
 	}
 
 	/**
