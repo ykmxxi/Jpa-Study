@@ -47,14 +47,26 @@ public class OrderSimpleApiController {
 	 * V2. 엔티티를 조회해서 DTO로 변환(fetch join 사용X)
 	 * - 단점: 지연로딩으로 쿼리 N번 호출(성능 문제)
 	 * - 주문이 2개 이면
-	 * 	- SQL 1번: 주문 조회(2개)
-	 * 	- 1번째 주문: 회원 조회 + 배송 조회 -> SQL 2번
-	 * 	- 2번째 주문: 회원 조회 + 배송 조회 -> SQL 2번
-	 * 	- 총 5번의 쿼리가 나감
+	 * - SQL 1번: 주문 조회(2개)
+	 * - 1번째 주문: 회원 조회 + 배송 조회 -> SQL 2번
+	 * - 2번째 주문: 회원 조회 + 배송 조회 -> SQL 2번
+	 * - 총 5번의 쿼리가 나감
 	 */
 	@GetMapping("/api/v2/simple-orders")
 	public List<SimpleOrderDto> ordersV2() {
 		List<Order> orders = orderRepository.findAllByString(new OrderSearch());
+		return orders.stream()
+					 .map(SimpleOrderDto::new)
+					 .collect(Collectors.toList());
+	}
+
+	/**
+	 * V3. 엔티티를 조회해서 DTO로 변환(fetch join 사용O)
+	 * - fetch join으로 쿼리 1번 호출
+	 */
+	@GetMapping("/api/v3/simple-orders")
+	public List<SimpleOrderDto> ordersV3() {
+		List<Order> orders = orderRepository.findAllWithMemberDelivery();
 		return orders.stream()
 					 .map(SimpleOrderDto::new)
 					 .collect(Collectors.toList());

@@ -63,7 +63,7 @@ public class OrderRepository {
 		}
 
 		TypedQuery<Order> query = em.createQuery(jpql, Order.class)
-			.setMaxResults(1000);
+									.setMaxResults(1000);
 		if (orderSearch.getOrderStatus() != null) {
 			query = query.setParameter("status", orderSearch.getOrderStatus());
 		}
@@ -100,6 +100,15 @@ public class OrderRepository {
 		cq.where(cb.and(criteria.toArray(new Predicate[criteria.size()])));
 		TypedQuery<Order> query = em.createQuery(cq).setMaxResults(1000); // 최대 1000건
 		return query.getResultList();
+	}
+
+	public List<Order> findAllWithMemberDelivery() {
+		String jpql = "select o from Order o"
+			+ " join fetch o.member m"
+			+ " join fetch o.delivery d";
+
+		return em.createQuery(jpql, Order.class)
+				 .getResultList();
 	}
 
 }
