@@ -3,6 +3,7 @@ package study.datajpa.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +11,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
+import study.datajpa.dto.MemberDto;
 import study.datajpa.entity.Member;
+import study.datajpa.entity.Team;
 
 @SpringBootTest
 @Transactional
@@ -18,6 +21,7 @@ import study.datajpa.entity.Member;
 class MemberRepositoryTest {
 
 	@Autowired private MemberRepository memberRepository;
+	@Autowired private TeamRepository teamRepository;
 
 	@Test
 	void testMember() {
@@ -107,6 +111,43 @@ class MemberRepositoryTest {
 
 		// then
 		assertThat(result.get(0)).isEqualTo(member1);
+	}
+
+	@Test
+	void findUsernameList() {
+		// given
+		Member member1 = new Member("kim", 10);
+		Member member2 = new Member("lee", 20);
+		memberRepository.save(member1);
+		memberRepository.save(member2);
+
+		// when
+		List<String> result = memberRepository.findUsernameList();
+
+		// then
+		assertThat(result).containsExactly("kim", "lee");
+	}
+
+	@Test
+	void findMemberDto() {
+		// given
+		Team teamA = new Team("teamA");
+		teamRepository.save(teamA);
+
+		Member member1 = new Member("kim", 10, teamA);
+		Member member2 = new Member("lee", 20, teamA);
+		memberRepository.save(member1);
+		memberRepository.save(member2);
+
+		// when
+		List<MemberDto> result = memberRepository.findMemberDto();
+
+		// then
+		assertThat(result.stream()
+						 .map(MemberDto::getTeamName)
+						 .distinct()
+						 .collect(Collectors.toList())
+		).containsExactly("teamA");
 	}
 
 }
