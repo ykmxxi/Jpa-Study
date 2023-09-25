@@ -44,4 +44,14 @@ public class MemberJpaRepository {
 		return em.find(Member.class, id);
 	}
 
+	/**
+	 * 이름과 나이를 기준으로 전체 회원을 조회
+	 */
+	public List<Member> findByUsernameAndAgeGreaterThan(String username, int age) {
+		return em.createQuery("select m from Member m where m.username = :username and m.age > :age", Member.class)
+				 .setParameter("username", username)
+				 .setParameter("age", age)
+				 .getResultList();
+	}
+
 }

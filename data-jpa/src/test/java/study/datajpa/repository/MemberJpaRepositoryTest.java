@@ -58,11 +58,26 @@ class MemberJpaRepositoryTest {
 		// 삭제 검증
 		memberJpaRepository.delete(member1);
 		memberJpaRepository.delete(member2);
-		
+
 		long deleteCount = memberJpaRepository.count();
 		assertThat(deleteCount).isEqualTo(0L);
 	}
 
+	@Test
+	void findByUsernameAndAgeGreaterThan() {
+		// given
+		Member member1 = new Member("kim", 10);
+		Member member2 = new Member("kim", 20);
+		memberJpaRepository.save(member1);
+		memberJpaRepository.save(member2);
+
+		// when
+		List<Member> result = memberJpaRepository.findByUsernameAndAgeGreaterThan("kim", 15);
+
+		// then
+		assertThat(result.get(0).getUsername()).isEqualTo("kim");
+		assertThat(result.get(0).getAge()).isEqualTo(20);
+		assertThat(result.size()).isEqualTo(1);
+	}
+
 }
-
-
