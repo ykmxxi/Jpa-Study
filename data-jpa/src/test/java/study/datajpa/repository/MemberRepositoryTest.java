@@ -150,4 +150,19 @@ class MemberRepositoryTest {
 		).containsExactly("teamA");
 	}
 
+	@Test
+	void findByNames() {
+		// given
+		Member member1 = new Member("kim", 10);
+		Member member2 = new Member("lee", 20);
+		memberRepository.save(member1);
+		memberRepository.save(member2);
+
+		// when
+		List<Member> result = memberRepository.findByNames(List.of("kim", "lee"));
+
+		// then
+		assertThat(result).containsExactly(member1, member2);
+	}
+
 }
