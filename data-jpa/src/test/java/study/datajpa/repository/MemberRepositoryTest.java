@@ -9,6 +9,10 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -183,6 +187,46 @@ class MemberRepositoryTest {
 		System.out.println("result1 = " + result1);
 		System.out.println("result2 = " + result2);
 		System.out.println("result3 = " + result3);
+	}
+
+	@Test
+	void paging() {
+		// given
+		memberRepository.save(new Member("member1", 10));
+		memberRepository.save(new Member("member2", 10));
+		memberRepository.save(new Member("member3", 10));
+		memberRepository.save(new Member("member4", 10));
+		memberRepository.save(new Member("member5", 10));
+
+		int age = 10;
+		PageRequest pageRequest = PageRequest.of(0, 3, Sort.Direction.DESC, "username");
+
+		// when
+		Page<Member> page = memberRepository.findByAge(age, pageRequest);
+		Slice<Member> slice = memberRepository.findSliceByAge(age, pageRequest);
+		// 실무에서는 엔티티를 DTO로 변환시킨 후 반환해야 한다
+		Page<MemberDto> dtoPage = page.map(m -> new MemberDto(m.getId(), m.getUsername(), "teamA"));
+		for (MemberDto memberDto : dtoPage) {
+			System.out.println("memberDto = " + memberDto);
+		}
+
+		// then
+		List<Member> content = page.getContent();
+		List<Member> sliceContent = slice.getContent();
+
+		assertThat(content.size()).isEqualTo(3); // 조회된 데이터 수
+		assertThat(page.getTotalElements()).isEqualTo(5); // 전체 데이터 수
+		assertThat(page.getNumber()).isEqualTo(0); // 페이지 번호
+		assertThat(page.getTotalPages()).isEqualTo(2); // 전체 페이지 번호
+		assertThat(page.isFirst()).isTrue(); // 첫번째 항목인가?
+		assertThat(page.hasNext()).isTrue(); // 다음 페이지가 있는가?
+
+		assertThat(sliceContent.size()).isEqualTo(3); // 조회된 데이터 수
+//		assertThat(slice.getTotalElements()).isEqualTo(5); // Slice는 전체 count 쿼리가 안나감
+		assertThat(slice.getNumber()).isEqualTo(0); // 페이지 번호
+//		assertThat(slice.getTotalPages()).isEqualTo(2); // Slice는 전체 count 쿼리가 안나감
+		assertThat(slice.isFirst()).isTrue(); // 첫번째 항목인가?
+		assertThat(slice.hasNext()).isTrue(); // 다음 페이지가 있는가?
 	}
 
 }
