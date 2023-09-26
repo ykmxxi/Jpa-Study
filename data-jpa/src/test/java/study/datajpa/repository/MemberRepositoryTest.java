@@ -3,6 +3,7 @@ package study.datajpa.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
@@ -163,6 +164,25 @@ class MemberRepositoryTest {
 
 		// then
 		assertThat(result).containsExactly(member1, member2);
+	}
+
+	@Test
+	void returnTypes() {
+		// given
+		Member member1 = new Member("kim", 10);
+		Member member2 = new Member("lee", 20);
+		memberRepository.save(member1);
+		memberRepository.save(member2);
+
+		// when
+		Member result1 = memberRepository.findMembers("kim");
+		List<Member> result2 = memberRepository.findByUsername("kim");
+		Optional<Member> result3 = memberRepository.findOptionalByUsername("lee");
+
+		// then
+		System.out.println("result1 = " + result1);
+		System.out.println("result2 = " + result2);
+		System.out.println("result3 = " + result3);
 	}
 
 }
