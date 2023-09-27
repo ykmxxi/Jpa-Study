@@ -6,6 +6,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceUnitUtil;
+
+import org.hibernate.Hibernate;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -27,6 +32,7 @@ class MemberRepositoryTest {
 
 	@Autowired private MemberRepository memberRepository;
 	@Autowired private TeamRepository teamRepository;
+	@PersistenceContext private EntityManager em;
 
 	@Test
 	void testMember() {
@@ -247,6 +253,43 @@ class MemberRepositoryTest {
 		// then
 		assertThat(resultCount).isEqualTo(3);
 		assertThat(result.getAge()).isEqualTo(41);
+	}
+
+	@Test
+	void findMemberLazy() {
+		// given
+		// member1 -> teamA, member2 -> teamB
+		Team teamA = new Team("teamA");
+		Team teamB = new Team("teamB");
+		teamRepository.save(teamA);
+		teamRepository.save(teamB);
+
+		Member member1 = new Member("member1", 10, teamA);
+		Member member2 = new Member("member2", 20, teamB);
+		memberRepository.save(member1);
+		memberRepository.save(member2);
+
+		em.flush();
+		em.clear();
+
+		// when
+		// N + 1 문제: member 조회(1) + team 조회(N)
+		List<Member> members = memberRepository.findAll();
+
+		// then
+		for (Member member : members) {
+			System.out.println("member = " + member);
+			System.out.println("team.getClass() = " + member.getTeam().getClass()); // proxy
+			System.out.println("member.team = " + member.getTeam().getName());
+		}
+
+		boolean isLazy1 = Hibernate.isInitialized(members.get(0).getTeam());
+
+		PersistenceUnitUtil util = em.getEntityManagerFactory().getPersistenceUnitUtil();
+		boolean isLazy2 = util.isLoaded(members.get(0).getTeam());
+
+		assertThat(isLazy1).isTrue();
+		assertThat(isLazy2).isTrue();
 	}
 
 }
