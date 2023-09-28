@@ -78,9 +78,9 @@ class MemberTest {
 
 		// then
 		assertThat(findMember.getUsername()).isEqualTo("member2");
-		assertThat(findMember.getUpdatedDate()).isAfter(findMember.getCreatedDate());
+		assertThat(findMember.getLastModifiedDate()).isAfter(findMember.getCreatedDate());
 		System.out.println("findMember.getCreatedDate() = " + findMember.getCreatedDate());
-		System.out.println("findMember.getUpdatedDate() = " + findMember.getUpdatedDate());
+		System.out.println("findMember.getLastModifiedDate() = " + findMember.getLastModifiedDate());
 	}
 
 }
