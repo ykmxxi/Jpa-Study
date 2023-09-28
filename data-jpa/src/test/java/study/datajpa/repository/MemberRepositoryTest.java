@@ -350,4 +350,16 @@ class MemberRepositoryTest {
 		// then
 	}
 
+	@Test
+	void callCustom() {
+		Member member1 = new Member("member1", 10);
+		memberRepository.save(member1);
+
+		List<Member> memberCustom = memberRepository.findMemberCustom();
+		for (Member member : memberCustom) {
+			System.out.println("member = " + member);
+		}
+
+	}
+
 }
