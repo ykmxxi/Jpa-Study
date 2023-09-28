@@ -9,9 +9,12 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
+
+import study.datajpa.repository.MemberRepository;
 
 @SpringBootTest
 @Transactional
@@ -19,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 class MemberTest {
 
 	@PersistenceContext EntityManager em;
+	@Autowired MemberRepository memberRepository;
 
 	@Test
 	void testEntity() {
@@ -55,6 +59,28 @@ class MemberTest {
 						  .map(Member::getUsername)
 						  .collect(Collectors.toList())
 		).containsExactly("member1", "member2", "member3", "member4");
+	}
+
+	@Test
+	void jpaEventBaseEntity() throws Exception {
+		// given
+		Member member = new Member("member1");
+		memberRepository.save(member); // @PrePersist 발생
+
+		Thread.sleep(1000);
+		member.setUsername("member2");
+
+		em.flush(); // @PreUpdate
+		em.clear();
+
+		// when
+		Member findMember = memberRepository.findById(member.getId()).get();
+
+		// then
+		assertThat(findMember.getUsername()).isEqualTo("member2");
+		assertThat(findMember.getUpdatedDate()).isAfter(findMember.getCreatedDate());
+		System.out.println("findMember.getCreatedDate() = " + findMember.getCreatedDate());
+		System.out.println("findMember.getUpdatedDate() = " + findMember.getUpdatedDate());
 	}
 
 }
