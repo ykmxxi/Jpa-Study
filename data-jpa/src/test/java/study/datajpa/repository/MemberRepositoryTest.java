@@ -452,4 +452,31 @@ class MemberRepositoryTest {
 		assertThat(result3.get(0).getTeam().getName()).isEqualTo("teamA");
 	}
 
+	@Test
+	void nativeQuery() {
+		// given
+		Team teamA = new Team("teamA");
+		em.persist(teamA);
+
+		Member m1 = new Member("m1", 0, teamA);
+		Member m2 = new Member("m2", 0, teamA);
+		em.persist(m1);
+		em.persist(m2);
+
+		em.flush();
+		em.clear();
+
+		// when
+		Member result = memberRepository.findByNativeQuery("m1");
+		Page<MemberProjection> page = memberRepository.findByNativeProjection(PageRequest.of(0, 10));
+		List<String> result2 = page.getContent()
+								   .stream()
+								   .map(MemberProjection::getUsername)
+								   .collect(Collectors.toList());
+
+		// then
+		assertThat(result.getUsername()).isEqualTo("m1");
+		assertThat(result2).containsExactly("m1", "m2");
+	}
+
 }
