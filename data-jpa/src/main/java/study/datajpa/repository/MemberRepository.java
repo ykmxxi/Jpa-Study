@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -20,7 +21,8 @@ import org.springframework.data.repository.query.Param;
 import study.datajpa.dto.MemberDto;
 import study.datajpa.entity.Member;
 
-public interface MemberRepository extends JpaRepository<Member, Long>, MemberRepositoryCustom {
+public interface MemberRepository
+	extends JpaRepository<Member, Long>, MemberRepositoryCustom, JpaSpecificationExecutor<Member> {
 
 	/**
 	 * 이름과 나이를 기준으로 전체 회원을 조회
@@ -96,5 +98,25 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberRep
 	 */
 	@Lock(LockModeType.PESSIMISTIC_WRITE)
 	List<Member> findLockByUsername(String username);
+
+	/**
+	 * Projections
+	 */
+	<T> List<T> findProjectionsByUsername(@Param("username") String username, Class<T> type);
+
+	/**
+	 * JPA Native SQL
+	 */
+	@Query(value = "select * from member where username = ?", nativeQuery = true)
+	Member findByNativeQuery(String username);
+
+	/**
+	 * 스프링 데이터 JPA 네이티브 쿼리 + 인터페이스 기반 Projections 활용
+	 */
+	@Query(value = "select m.member_id as id, m.username, t.name as teamName " +
+		"from member m left join team t ON m.team_id = t.team_id",
+		countQuery = "SELECT count(*) from member",
+		nativeQuery = true)
+	Page<MemberProjection> findByNativeProjection(Pageable pageable);
 
 }
