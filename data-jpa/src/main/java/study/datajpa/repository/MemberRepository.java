@@ -102,6 +102,6 @@ public interface MemberRepository
 	/**
 	 * Projections
 	 */
-	List<UsernameOnly> findProjectionsByUsername(@Param("username") String username);
+	<T> List<T> findProjectionsByUsername(@Param("username") String username, Class<T> type);
 
 }

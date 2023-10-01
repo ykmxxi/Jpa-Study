@@ -435,11 +435,15 @@ class MemberRepositoryTest {
 		em.clear();
 
 		// when
-		List<UsernameOnly> result = memberRepository.findProjectionsByUsername("m1");
+		List<UsernameOnly> result = memberRepository.findProjectionsByUsername("m1", UsernameOnly.class);
+		List<UsernameOnlyDto> result2 = memberRepository.findProjectionsByUsername("m1", UsernameOnlyDto.class);
 
 		// then
 		assertThat(result.size()).isEqualTo(1);
 		assertThat(result.get(0).getUsername()).isEqualTo("m1");
+
+		assertThat(result2.size()).isEqualTo(1);
+		assertThat(result2.get(0).getUsername()).isEqualTo("m1");
 	}
 
 }
