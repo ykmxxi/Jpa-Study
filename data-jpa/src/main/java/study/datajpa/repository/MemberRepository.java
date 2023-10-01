@@ -99,4 +99,9 @@ public interface MemberRepository
 	@Lock(LockModeType.PESSIMISTIC_WRITE)
 	List<Member> findLockByUsername(String username);
 
+	/**
+	 * Projections
+	 */
+	List<UsernameOnly> findProjectionsByUsername(@Param("username") String username);
+
 }
