@@ -437,6 +437,8 @@ class MemberRepositoryTest {
 		// when
 		List<UsernameOnly> result = memberRepository.findProjectionsByUsername("m1", UsernameOnly.class);
 		List<UsernameOnlyDto> result2 = memberRepository.findProjectionsByUsername("m1", UsernameOnlyDto.class);
+		List<NestedClosedProjection> result3 =
+			memberRepository.findProjectionsByUsername("m1", NestedClosedProjection.class);
 
 		// then
 		assertThat(result.size()).isEqualTo(1);
@@ -444,6 +446,10 @@ class MemberRepositoryTest {
 
 		assertThat(result2.size()).isEqualTo(1);
 		assertThat(result2.get(0).getUsername()).isEqualTo("m1");
+
+		assertThat(result3.size()).isEqualTo(1);
+		assertThat(result3.get(0).getUsername()).isEqualTo("m1");
+		assertThat(result3.get(0).getTeam().getName()).isEqualTo("teamA");
 	}
 
 }
