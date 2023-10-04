@@ -161,4 +161,35 @@ public class QuerydslBasicTest {
 		assertThat(memberNull.getUsername()).isNull();
 	}
 
+	/**
+	 * 페이징: 조회 건수 제한
+	 */
+	@Test
+	void paging1() {
+		List<Member> result = queryFactory.selectFrom(member)
+										  .orderBy(member.username.desc())
+										  .offset(1) // 앞에 몇 개를 skip, 0부터 시작 -> 1개 생략
+										  .limit(2) // 2개만 가져오기
+										  .fetch();
+
+		assertThat(result).hasSize(2);
+	}
+
+	/**
+	 * 페이징: 전체 조회 수(total count)가 필요하면?
+	 */
+	@Test
+	void paging2() {
+		QueryResults<Member> queryResults = queryFactory.selectFrom(member)
+														.orderBy(member.username.desc())
+														.offset(1)
+														.limit(2)
+														.fetchResults();
+
+		assertThat(queryResults.getTotal()).isEqualTo(4);
+		assertThat(queryResults.getLimit()).isEqualTo(2);
+		assertThat(queryResults.getOffset()).isEqualTo(1);
+		assertThat(queryResults.getResults()).hasSize(2);
+	}
+
 }
