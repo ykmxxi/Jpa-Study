@@ -1,6 +1,7 @@
 package study.querydsl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static study.querydsl.entity.QMember.member;
 
 import javax.persistence.EntityManager;
 
@@ -61,6 +62,23 @@ public class QuerydslBasicTest {
 		Member findMember = queryFactory.select(m)
 										.from(m)
 										.where(m.username.eq("member1"))
+										.fetchOne();
+
+		assertThat(findMember.getUsername()).isEqualTo("member1");
+	}
+
+	@Test
+	void startQuerydsl2() {
+		// 별칭 직접 지정
+		QMember qMember1 = new QMember("m");
+
+		// 기본 인스턴스 사용
+		QMember qMember2 = member;
+
+		// 기본 인스턴스 static import 사용
+		Member findMember = queryFactory.select(member)
+										.from(member)
+										.where(member.username.eq("member1"))
 										.fetchOne();
 
 		assertThat(findMember.getUsername()).isEqualTo("member1");
