@@ -2,6 +2,7 @@ package study.querydsl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static study.querydsl.entity.QMember.member;
+import static study.querydsl.entity.QTeam.team;
 
 import java.util.List;
 
@@ -222,6 +223,28 @@ public class QuerydslBasicTest {
 		assertThat(tuple.get(member.age.avg())).isEqualTo(25);
 		assertThat(tuple.get(member.age.max())).isEqualTo(40);
 		assertThat(tuple.get(member.age.min())).isEqualTo(10);
+	}
+
+	/**
+	 * 팀의 이름과 각 팀의 평균 연령을 구하기
+	 */
+	@Test
+	void group() {
+		List<Tuple> result = queryFactory.select(team.name, member.age.avg())
+										 .from(member)
+										 .join(member.team, team)
+										 .groupBy(team.name)
+										 .having(member.age.avg().gt(10))
+										 .fetch();
+
+		Tuple teamA = result.get(0);
+		Tuple teamB = result.get(1);
+
+		assertThat(teamA.get(team.name)).isEqualTo("teamA");
+		assertThat(teamA.get(member.age.avg())).isEqualTo(15);
+
+		assertThat(teamB.get(team.name)).isEqualTo("teamB");
+		assertThat(teamB.get(member.age.avg())).isEqualTo(35);
 	}
 
 }
