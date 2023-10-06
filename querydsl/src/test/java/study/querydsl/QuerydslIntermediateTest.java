@@ -252,4 +252,59 @@ public class QuerydslIntermediateTest {
 		return member.age.eq(ageCondition);
 	}
 
+	/**
+	 * 벌크 연산: 수정
+	 * - 벌크 연산 후 DB는 수정 쿼리가 반영되지만 영속성 컨텍스트 반영 X
+	 * - 영속성 컨텍스트 초기화가 필요
+	 */
+	@Test
+	void bulkUpdate() {
+		long count = queryFactory
+			.update(member)
+			.set(member.username, "비회원")
+			.where(member.age.lt(28))
+			.execute();
+
+		List<Member> before = queryFactory
+			.selectFrom(member)
+			.where(member.age.lt(28))
+			.fetch();
+		assertThat(before.get(0).getUsername()).isEqualTo("member1");
+
+		em.flush();
+		em.clear();
+
+		List<Member> after = queryFactory
+			.selectFrom(member)
+			.where(member.age.lt(28))
+			.fetch();
+		assertThat(after.get(0).getUsername()).isEqualTo("비회원");
+	}
+
+	@Test
+	void bulkAdd() {
+		long count = queryFactory
+			.update(member)
+			.set(member.age, member.age.add(1))
+			.execute();
+
+		em.flush();
+		em.clear();
+
+		assertThat(count).isEqualTo(4L);
+	}
+
+	@Test
+	void bulkDelete() {
+		long count = queryFactory
+			.delete(member)
+			.where(member.age.gt(18))
+			.execute();
+
+		em.flush();
+		em.clear();
+
+		assertThat(count).isEqualTo(3L);
+	}
+
 }
