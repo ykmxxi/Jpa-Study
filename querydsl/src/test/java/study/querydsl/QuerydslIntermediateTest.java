@@ -19,6 +19,7 @@ import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import study.querydsl.dto.MemberDto;
+import study.querydsl.dto.QMemberDto;
 import study.querydsl.dto.UserDto;
 import study.querydsl.entity.Member;
 import study.querydsl.entity.QMember;
@@ -161,6 +162,23 @@ public class QuerydslIntermediateTest {
 
 		for (UserDto userDto : result) {
 			System.out.println("userDto = " + userDto);
+		}
+	}
+
+	/**
+	 * @QueryProjection
+	 * - 컴파일러로 타입을 체크할 수 있어 가장 안전한 방법
+	 * - DTO에 Querydsl 어노테이션을 유지해야 하는 점과 DTO까지 Q-Type을 생성해야 하는 단점 존재
+	 */
+	@Test
+	void findDtoByQueryProjection() {
+		List<MemberDto> result = queryFactory
+			.select(new QMemberDto(member.username, member.age))
+			.from(member)
+			.fetch();
+
+		for (MemberDto memberDto : result) {
+			System.out.println("memberDto = " + memberDto);
 		}
 	}
 
