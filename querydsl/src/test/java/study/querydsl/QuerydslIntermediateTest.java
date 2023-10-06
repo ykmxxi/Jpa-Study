@@ -13,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.querydsl.core.Tuple;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import study.querydsl.dto.MemberDto;
@@ -86,6 +87,51 @@ public class QuerydslIntermediateTest {
 		String jpql = "select new study.querydsl.dto.MemberDto(m.username, m.age) from Member m";
 		List<MemberDto> result = em.createQuery(jpql, MemberDto.class)
 								   .getResultList();
+		for (MemberDto memberDto : result) {
+			System.out.println("memberDto = " + memberDto);
+		}
+	}
+
+	/**
+	 * Querydsl로 DTO 조회: 프로퍼티 접근(setter)
+	 */
+	@Test
+	void findDtoBySetter() {
+		List<MemberDto> result = queryFactory
+			.select(Projections.bean(MemberDto.class, member.username, member.age))
+			.from(member)
+			.fetch();
+
+		for (MemberDto memberDto : result) {
+			System.out.println("memberDto = " + memberDto);
+		}
+	}
+
+	/**
+	 * Querydsl로 DTO 조회: 필드 직접 접근
+	 */
+	@Test
+	void findDtoByField() {
+		List<MemberDto> result = queryFactory
+			.select(Projections.fields(MemberDto.class, member.username, member.age))
+			.from(member)
+			.fetch();
+
+		for (MemberDto memberDto : result) {
+			System.out.println("memberDto = " + memberDto);
+		}
+	}
+
+	/**
+	 * Querydsl로 DTO 조회: 생성자 사용
+	 */
+	@Test
+	void findDtoByConstructor() {
+		List<MemberDto> result = queryFactory
+			.select(Projections.constructor(MemberDto.class, member.username, member.age))
+			.from(member)
+			.fetch();
+
 		for (MemberDto memberDto : result) {
 			System.out.println("memberDto = " + memberDto);
 		}
