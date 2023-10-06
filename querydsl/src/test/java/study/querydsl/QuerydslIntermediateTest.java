@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
+import study.querydsl.dto.MemberDto;
 import study.querydsl.entity.Member;
 import study.querydsl.entity.Team;
 
@@ -74,6 +75,19 @@ public class QuerydslIntermediateTest {
 			Integer age = tuple.get(member.age);
 
 			System.out.println("username = " + username + ", age = " + age);
+		}
+	}
+
+	/**
+	 * 순수 JPA로 DTO 조회
+	 */
+	@Test
+	void findDtoByJPQL() {
+		String jpql = "select new study.querydsl.dto.MemberDto(m.username, m.age) from Member m";
+		List<MemberDto> result = em.createQuery(jpql, MemberDto.class)
+								   .getResultList();
+		for (MemberDto memberDto : result) {
+			System.out.println("memberDto = " + memberDto);
 		}
 	}
 
