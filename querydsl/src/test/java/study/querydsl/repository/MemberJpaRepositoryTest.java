@@ -79,8 +79,8 @@ class MemberJpaRepositoryTest {
 		MemberSearchCondition condition2 = new MemberSearchCondition();
 		condition2.setTeamName("teamB");
 
-		List<MemberTeamDto> result1 = memberJpaRepository.searchByBuilder(condition1);
-		List<MemberTeamDto> result2 = memberJpaRepository.searchByBuilder(condition2);
+		List<MemberTeamDto> result1 = memberJpaRepository.search(condition1);
+		List<MemberTeamDto> result2 = memberJpaRepository.search(condition2);
 
 		assertThat(result1).extracting("username")
 						   .containsExactly("member4");
