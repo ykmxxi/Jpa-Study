@@ -38,4 +38,18 @@ class MemberJpaRepositoryTest {
 		assertThat(result2).containsExactly(member);
 	}
 
+	@Test
+	void basicTest_Querydsl() {
+		Member member = new Member("member1", 10);
+		memberJpaRepository.save(member);
+
+		// 전체 조회: querydsl
+		List<Member> result1 = memberJpaRepository.findAll_Querydsl();
+		assertThat(result1).containsExactly(member);
+
+		// 조건 검색: querydsl
+		List<Member> result2 = memberJpaRepository.findByUsername_Querydsl("member1");
+		assertThat(result2).containsExactly(member);
+	}
+
 }
