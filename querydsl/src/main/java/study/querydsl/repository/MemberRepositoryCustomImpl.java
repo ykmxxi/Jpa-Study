@@ -11,6 +11,7 @@ import javax.persistence.EntityManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 import org.springframework.data.support.PageableExecutionUtils;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -20,13 +21,34 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import study.querydsl.dto.MemberSearchCondition;
 import study.querydsl.dto.MemberTeamDto;
 import study.querydsl.dto.QMemberTeamDto;
+import study.querydsl.entity.Member;
 
-public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
+public class MemberRepositoryCustomImpl extends QuerydslRepositorySupport implements MemberRepositoryCustom {
 
 	private final JPAQueryFactory queryFactory;
 
 	public MemberRepositoryCustomImpl(EntityManager em) {
+		super(Member.class);
 		this.queryFactory = new JPAQueryFactory(em);
+	}
+
+	public List<MemberTeamDto> searchByQuerydslRepositorySupport(MemberSearchCondition condition) {
+		return from(member)
+			.leftJoin(member.team, team)
+			.where(
+				usernameEq(condition.getUsername()),
+				teamNameEq(condition.getTeamName()),
+				ageGoe(condition.getAgeGoe()),
+				ageLoe(condition.getAgeLoe())
+			)
+			.select(new QMemberTeamDto(
+				member.id,
+				member.username,
+				member.age,
+				team.id,
+				team.name)
+			)
+			.fetch();
 	}
 
 	@Override
